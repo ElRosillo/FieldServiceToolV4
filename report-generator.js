@@ -383,8 +383,6 @@ function renderEvidencePage(report, equipment, equipmentIndex, title, photos, su
       <div class="page-inner">
         <div class="evidence-topbar">
           <div class="evidence-meta-box">
-            <div class="label">Folio reporte</div>
-            <div class="value">${escapeHtml(report.reportNumber || "Sin folio")}</div>
             <div class="label">Folio checklist</div>
             <div class="value">${escapeHtml(equipment.checklistFolio || "No capturado")}</div>
             <div class="label">Fecha</div>
