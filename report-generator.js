@@ -189,11 +189,13 @@ function renderEquipmentPage(report, equipment, index) {
             <td>${escapeHtml(equipment.ratedCapacity || "No capturado")}</td>
           </tr>
           <tr>
-            <th colspan="2">Serie / Identificacion</th>
+            <th>Serie / Identificacion</th>
+            <th>Folio checklist</th>
             <th>Ubicacion puntual</th>
           </tr>
           <tr>
-            <td colspan="2">${escapeHtml(equipment.serialNumber || "No capturado")}</td>
+            <td>${escapeHtml(equipment.serialNumber || "No capturado")}</td>
+            <td>${escapeHtml(equipment.checklistFolio || "No capturado")}</td>
             <td>${escapeHtml(equipment.equipmentLocation || "No capturado")}</td>
           </tr>
           <tr>
@@ -381,8 +383,10 @@ function renderEvidencePage(report, equipment, equipmentIndex, title, photos, su
       <div class="page-inner">
         <div class="evidence-topbar">
           <div class="evidence-meta-box">
-            <div class="label">Folio</div>
+            <div class="label">Folio reporte</div>
             <div class="value">${escapeHtml(report.reportNumber || "Sin folio")}</div>
+            <div class="label">Folio checklist</div>
+            <div class="value">${escapeHtml(equipment.checklistFolio || "No capturado")}</div>
             <div class="label">Fecha</div>
             <div class="value">${escapeHtml(report.inspectionDateLabel || "No capturada")}</div>
           </div>

@@ -71,6 +71,7 @@ const elements = {
   craneType: document.getElementById("craneType"),
   ratedCapacity: document.getElementById("ratedCapacity"),
   serialNumber: document.getElementById("serialNumber"),
+  checklistFolio: document.getElementById("checklistFolio"),
   equipmentLocation: document.getElementById("equipmentLocation"),
   hoistType: document.getElementById("hoistType"),
   hoistCapacity: document.getElementById("hoistCapacity"),
@@ -208,6 +209,7 @@ function loadEquipmentIntoEditor(equipment) {
   elements.craneType.value = equipment.craneType;
   elements.ratedCapacity.value = equipment.ratedCapacity;
   elements.serialNumber.value = equipment.serialNumber;
+  elements.checklistFolio.value = equipment.checklistFolio;
   elements.equipmentLocation.value = equipment.equipmentLocation;
   elements.hoistType.value = equipment.hoistType;
   elements.hoistCapacity.value = equipment.hoistCapacity;
@@ -468,6 +470,7 @@ function saveEquipmentFromEditor() {
     craneType: elements.craneType.value,
     ratedCapacity: elements.ratedCapacity.value.trim(),
     serialNumber: elements.serialNumber.value.trim(),
+    checklistFolio: elements.checklistFolio.value.trim(),
     equipmentLocation: elements.equipmentLocation.value.trim(),
     hoistType: elements.hoistType.value.trim(),
     hoistCapacity: elements.hoistCapacity.value.trim(),
@@ -556,6 +559,7 @@ function buildGenericFindingDescription(category, incidence) {
 function buildEquipmentCardSummary(equipment) {
   const pieces = [
     equipment.serialNumber ? `Serie ${equipment.serialNumber}` : "",
+    equipment.checklistFolio ? `Checklist ${equipment.checklistFolio}` : "",
     equipment.overallCondition
   ].filter(Boolean);
   return pieces.length ? pieces.join(" | ") : "Sin detalle adicional capturado.";
@@ -735,6 +739,7 @@ function createLegacyEquipment(record) {
     craneType: record.craneType || "Puente",
     ratedCapacity: record.ratedCapacity || "",
     serialNumber: record.serialNumber || "",
+    checklistFolio: record.checklistFolio || "",
     equipmentLocation: "",
     hoistType: "",
     hoistCapacity: "",
@@ -761,6 +766,7 @@ function createEmptyEquipment() {
     craneType: "Puente",
     ratedCapacity: "",
     serialNumber: "",
+    checklistFolio: "",
     equipmentLocation: "",
     hoistType: "",
     hoistCapacity: "",
@@ -787,6 +793,7 @@ function normalizeEquipment(equipment) {
     craneType: source.craneType || "Puente",
     ratedCapacity: source.ratedCapacity || "",
     serialNumber: source.serialNumber || "",
+    checklistFolio: source.checklistFolio || "",
     equipmentLocation: source.equipmentLocation || "",
     hoistType: source.hoistType || "",
     hoistCapacity: source.hoistCapacity || "",
