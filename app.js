@@ -34,7 +34,7 @@ let deferredInstallPrompt = null;
 let currentEquipments = [];
 let currentEquipmentFindings = [];
 let currentEquipmentServicePhotos = [];
-let currentChecklistPdf = null;
+let currentChecklistImage = null;
 let editingPhotos = [];
 
 const elements = {
@@ -57,7 +57,10 @@ const elements = {
   siteContactInfo: document.getElementById("siteContactInfo"),
   equipmentList: document.getElementById("equipmentList"),
   addEquipmentButton: document.getElementById("addEquipmentButton"),
+  importInspectionButton: document.getElementById("importInspectionButton"),
+  importInspectionInput: document.getElementById("importInspectionInput"),
   saveInspectionButton: document.getElementById("saveInspectionButton"),
+  exportInspectionButton: document.getElementById("exportInspectionButton"),
   generatePdfButton: document.getElementById("generatePdfButton"),
   newInspectionButton: document.getElementById("newInspectionButton"),
   savedReports: document.getElementById("savedReports"),
@@ -90,10 +93,10 @@ const elements = {
   servicePhotoGalleryInput: document.getElementById("servicePhotoGalleryInput"),
   servicePhotoCameraInput: document.getElementById("servicePhotoCameraInput"),
   servicePhotoPreview: document.getElementById("servicePhotoPreview"),
-  checklistPdfButton: document.getElementById("checklistPdfButton"),
-  clearChecklistPdfButton: document.getElementById("clearChecklistPdfButton"),
-  checklistPdfInput: document.getElementById("checklistPdfInput"),
-  checklistPdfStatus: document.getElementById("checklistPdfStatus"),
+  checklistImageButton: document.getElementById("checklistImageButton"),
+  clearChecklistImageButton: document.getElementById("clearChecklistImageButton"),
+  checklistImageInput: document.getElementById("checklistImageInput"),
+  checklistImageStatus: document.getElementById("checklistImageStatus"),
   cancelEquipmentButton: document.getElementById("cancelEquipmentButton"),
   saveEquipmentButton: document.getElementById("saveEquipmentButton"),
   findingEditorTitle: document.getElementById("findingEditorTitle"),
@@ -131,6 +134,8 @@ function setupAppActions() {
   elements.closeSidebarButton.addEventListener("click", closeSidebar);
   elements.sidebarBackdrop.addEventListener("click", closeSidebar);
   elements.addEquipmentButton.addEventListener("click", () => openEquipmentEditor());
+  elements.importInspectionButton.addEventListener("click", () => elements.importInspectionInput.click());
+  elements.importInspectionInput.addEventListener("change", handleInspectionImport);
   elements.cancelEquipmentButton.addEventListener("click", closeEquipmentEditor);
   elements.saveEquipmentButton.addEventListener("click", saveEquipmentFromEditor);
   elements.addFindingButton.addEventListener("click", () => openFindingEditor());
@@ -139,18 +144,19 @@ function setupAppActions() {
   elements.findingPhotoCameraButton.addEventListener("click", () => elements.findingPhotoCameraInput.click());
   elements.servicePhotoGalleryButton.addEventListener("click", () => elements.servicePhotoGalleryInput.click());
   elements.servicePhotoCameraButton.addEventListener("click", () => elements.servicePhotoCameraInput.click());
-  elements.checklistPdfButton.addEventListener("click", () => elements.checklistPdfInput.click());
-  elements.clearChecklistPdfButton.addEventListener("click", clearChecklistPdf);
+  elements.checklistImageButton.addEventListener("click", () => elements.checklistImageInput.click());
+  elements.clearChecklistImageButton.addEventListener("click", clearChecklistImage);
   elements.findingPhotoGalleryInput.addEventListener("change", handleFindingPhotos);
   elements.findingPhotoCameraInput.addEventListener("change", handleFindingPhotos);
   elements.servicePhotoGalleryInput.addEventListener("change", handleServicePhotos);
   elements.servicePhotoCameraInput.addEventListener("change", handleServicePhotos);
-  elements.checklistPdfInput.addEventListener("change", handleChecklistPdf);
+  elements.checklistImageInput.addEventListener("change", handleChecklistImage);
   elements.cancelFindingButton.addEventListener("click", closeFindingEditor);
   elements.saveFindingButton.addEventListener("click", saveFindingFromEditor);
   elements.saveInspectionButton.addEventListener("click", async () => {
     await persistInspection();
   });
+  elements.exportInspectionButton.addEventListener("click", exportCurrentInspection);
   elements.generatePdfButton.addEventListener("click", generatePdfReport);
   elements.newInspectionButton.addEventListener("click", resetForm);
   elements.refreshReportsButton.addEventListener("click", renderSavedReports);
@@ -223,10 +229,10 @@ function loadEquipmentIntoEditor(equipment) {
   elements.recommendations.value = equipment.recommendations;
   currentEquipmentFindings = equipment.findings.slice();
   currentEquipmentServicePhotos = equipment.servicePhotos.slice();
-  currentChecklistPdf = equipment.checklistPdf ? { ...equipment.checklistPdf } : null;
+  currentChecklistImage = equipment.checklistImage ? { ...equipment.checklistImage } : null;
   renderFindingsList();
   renderServicePhotos();
-  renderChecklistPdfStatus();
+  renderChecklistImageStatus();
 }
 
 function closeEquipmentEditor() {
@@ -239,14 +245,14 @@ function resetEquipmentEditorState() {
   elements.editingEquipmentId.value = "";
   currentEquipmentFindings = [];
   currentEquipmentServicePhotos = [];
-  currentChecklistPdf = null;
+  currentChecklistImage = null;
   const nextDate = new Date();
   nextDate.setMonth(nextDate.getMonth() + 6);
   elements.overallCondition.value = "Bueno";
   elements.nextInspection.value = nextDate.toISOString().slice(0, 10);
   renderFindingsList();
   renderServicePhotos();
-  renderChecklistPdfStatus();
+  renderChecklistImageStatus();
 }
 function openFindingEditor(findingId) {
   const categories = Object.keys(findingCatalog);
@@ -320,18 +326,18 @@ async function handleServicePhotos(event) {
   renderServicePhotos();
 }
 
-async function handleChecklistPdf(event) {
+async function handleChecklistImage(event) {
   const [file] = Array.from(event.target.files || []);
   if (!file) {
     return;
   }
 
-  currentChecklistPdf = {
+  currentChecklistImage = {
     name: file.name,
     dataUrl: await fileToDataUrl(file)
   };
-  elements.checklistPdfInput.value = "";
-  renderChecklistPdfStatus();
+  elements.checklistImageInput.value = "";
+  renderChecklistImageStatus();
 }
 
 function renderEditingPhotos() {
@@ -354,19 +360,19 @@ function renderServicePhotos() {
   });
 }
 
-function renderChecklistPdfStatus() {
-  if (!currentChecklistPdf || !currentChecklistPdf.dataUrl) {
-    elements.checklistPdfStatus.textContent = "Todavia no se ha adjuntado un checklist escaneado.";
+function renderChecklistImageStatus() {
+  if (!currentChecklistImage || !currentChecklistImage.dataUrl) {
+    elements.checklistImageStatus.textContent = "Todavia no se ha adjuntado una imagen del checklist.";
     return;
   }
 
-  elements.checklistPdfStatus.textContent = `PDF adjunto: ${currentChecklistPdf.name || "checklist.pdf"}`;
+  elements.checklistImageStatus.textContent = `Imagen adjunta: ${currentChecklistImage.name || "checklist.jpg"}`;
 }
 
-function clearChecklistPdf() {
-  currentChecklistPdf = null;
-  elements.checklistPdfInput.value = "";
-  renderChecklistPdfStatus();
+function clearChecklistImage() {
+  currentChecklistImage = null;
+  elements.checklistImageInput.value = "";
+  renderChecklistImageStatus();
 }
 
 function buildPhotoThumb(photo, onRemove) {
@@ -484,7 +490,7 @@ function saveEquipmentFromEditor() {
     serviceSummary: elements.serviceSummary.value.trim(),
     recommendations: elements.recommendations.value.trim(),
     servicePhotos: currentEquipmentServicePhotos.slice(),
-    checklistPdf: currentChecklistPdf ? { ...currentChecklistPdf } : null,
+    checklistImage: currentChecklistImage ? { ...currentChecklistImage } : null,
     updatedAt: new Date().toISOString()
   });
 
@@ -617,6 +623,15 @@ async function persistInspection() {
   return inspection;
 }
 
+async function exportCurrentInspection() {
+  const inspection = await persistInspection();
+  if (!inspection) {
+    return;
+  }
+
+  downloadInspectionJson(inspection);
+}
+
 async function generatePdfReport() {
   const popup = window.open("", "_blank");
   if (!popup) {
@@ -633,7 +648,12 @@ async function generatePdfReport() {
     return;
   }
 
-  openReportPdfWindow(inspection, popup);
+  try {
+    await openReportPdfWindow(inspection, popup);
+  } catch (error) {
+    popup.close();
+    window.alert("No se pudo generar el reporte PDF completo.");
+  }
 }
 
 async function renderSavedReports() {
@@ -657,6 +677,7 @@ async function renderSavedReports() {
         <p>${escapeHtml(record.serviceType || "Servicio")} | ${record.equipments.length} equipo(s)</p>
         <div class="saved-actions">
           <button class="secondary-button" type="button" data-open-id="${record.id}">Abrir</button>
+          <button class="secondary-button" type="button" data-export-id="${record.id}">Exportar</button>
           <button class="ghost-button" type="button" data-delete-id="${record.id}">Eliminar</button>
         </div>
       `;
@@ -680,6 +701,15 @@ async function renderSavedReports() {
         resetForm();
       }
       await renderSavedReports();
+    });
+  });
+
+  elements.savedReports.querySelectorAll("[data-export-id]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const record = await getInspection(button.dataset.exportId);
+      if (record) {
+        downloadInspectionJson(normalizeInspection(record));
+      }
     });
   });
 }
@@ -714,6 +744,35 @@ function resetForm() {
   resetEquipmentEditorState();
   renderEquipmentList();
   showView("inspection");
+}
+
+async function handleInspectionImport(event) {
+  const [file] = Array.from(event.target.files || []);
+  elements.importInspectionInput.value = "";
+
+  if (!file) {
+    return;
+  }
+
+  try {
+    const text = await file.text();
+    const imported = JSON.parse(text);
+    const normalized = normalizeInspection(imported);
+
+    if (!normalized || !normalized.id) {
+      throw new Error("Archivo invalido.");
+    }
+
+    await putInspection({
+      ...imported,
+      ...normalized,
+      updatedAt: new Date().toISOString()
+    });
+    loadInspection(normalized);
+    await renderSavedReports();
+  } catch (error) {
+    window.alert("No se pudo importar el reporte. Verifica que sea un archivo JSON exportado desde la app.");
+  }
 }
 
 function normalizeInspection(record) {
@@ -753,7 +812,7 @@ function createLegacyEquipment(record) {
     serviceSummary: "",
     recommendations: record.recommendations || "",
     servicePhotos: [],
-    checklistPdf: null
+    checklistImage: null
   };
 }
 
@@ -780,7 +839,7 @@ function createEmptyEquipment() {
     serviceSummary: "",
     recommendations: "",
     servicePhotos: [],
-    checklistPdf: null
+    checklistImage: null
   });
 }
 
@@ -812,10 +871,10 @@ function normalizeEquipment(equipment) {
     serviceSummary: source.serviceSummary || "",
     recommendations: source.recommendations || "",
     servicePhotos: Array.isArray(source.servicePhotos) ? source.servicePhotos : [],
-    checklistPdf: source.checklistPdf && source.checklistPdf.dataUrl
+    checklistImage: source.checklistImage && source.checklistImage.dataUrl
       ? {
-          name: source.checklistPdf.name || "checklist.pdf",
-          dataUrl: source.checklistPdf.dataUrl
+          name: source.checklistImage.name || "checklist.jpg",
+          dataUrl: source.checklistImage.dataUrl
         }
       : null
   };
@@ -913,4 +972,22 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function downloadInspectionJson(inspection) {
+  const payload = {
+    ...inspection,
+    exportedAt: new Date().toISOString(),
+    exportFormat: "crane-inspection-report-v1"
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const safeName = (inspection.reportNumber || "reporte").replace(/[^\w.-]+/g, "_");
+  link.href = url;
+  link.download = `${safeName}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }

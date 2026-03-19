@@ -47,14 +47,17 @@
           </div>
           <div class="toolbar">
             <button id="openSidebarButton" class="ghost-button" type="button">Historial</button>
+            <button id="importInspectionButton" class="ghost-button" type="button">Importar</button>
             <button id="newInspectionButton" class="ghost-button" type="button">Nueva</button>
             <button id="saveInspectionButton" class="secondary-button" type="button">Guardar</button>
+            <button id="exportInspectionButton" class="secondary-button" type="button">Exportar</button>
             <button id="generatePdfButton" class="primary-button" type="button">Generar PDF</button>
           </div>
         </div>
 
         <form id="inspectionForm">
           <input id="inspectionId" type="hidden">
+          <input id="importInspectionInput" class="file-input-hidden" type="file" accept="application/json">
 
           <div class="grid two-column">
             <label>
@@ -273,16 +276,16 @@
             <div class="section-header">
               <div>
                 <p class="eyebrow">Checklist escaneado</p>
-                <h3>PDF del formato fisico de revision</h3>
+                <h3>Imagen JPG del formato fisico de revision</h3>
               </div>
             </div>
 
             <div class="upload-actions">
-              <button id="checklistPdfButton" class="secondary-button" type="button">Adjuntar PDF</button>
-              <button id="clearChecklistPdfButton" class="ghost-button" type="button">Quitar PDF</button>
+              <button id="checklistImageButton" class="secondary-button" type="button">Adjuntar imagen</button>
+              <button id="clearChecklistImageButton" class="ghost-button" type="button">Quitar imagen</button>
             </div>
-            <input id="checklistPdfInput" class="file-input-hidden" type="file" accept="application/pdf">
-            <div id="checklistPdfStatus" class="inline-empty-state">Todavia no se ha adjuntado un checklist escaneado.</div>
+            <input id="checklistImageInput" class="file-input-hidden" type="file" accept="image/jpeg,image/jpg,image/*">
+            <div id="checklistImageStatus" class="inline-empty-state">Todavia no se ha adjuntado una imagen del checklist.</div>
           </section>
         </form>
       </section>

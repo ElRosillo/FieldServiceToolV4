@@ -43,7 +43,7 @@ const REPORT_STYLE = `
   .evidence-meta-box { border: 1px solid var(--header-color); background: #f7f7f7; padding: 2mm 2.4mm; min-width: 48mm; }
   .evidence-meta-box .label { font-size: 7pt; }
   .evidence-meta-box .value { font-size: 8.2pt; }
-  .pdf-frame { width: 100%; height: 238mm; border: 1px solid var(--header-color); background: #fff; }
+  .checklist-page-image { width: 100%; height: 238mm; object-fit: contain; border: 1px solid var(--header-color); background: #fff; display: block; }
   .muted { color: #666; font-style: italic; }
   .footer { position: absolute; bottom: 5mm; left: 8mm; right: 8mm; display: flex; justify-content: space-between; font-size: 7.5pt; color: #444; }
   .page-number::after { content: counter(page); }
@@ -54,8 +54,8 @@ const REPORT_STYLE = `
   }
 `;
 
-function openReportPdfWindow(inspection, existingPopup) {
-  const reportData = buildReportData(inspection);
+async function openReportPdfWindow(inspection, existingPopup) {
+  const reportData = await buildReportData(inspection);
   const popup = existingPopup || window.open("", "_blank");
 
   if (!popup) {
@@ -89,9 +89,11 @@ function openReportPdfWindow(inspection, existingPopup) {
   return true;
 }
 
-function buildReportData(inspection) {
+async function buildReportData(inspection) {
   const template = getTemplateConfig();
-  const equipments = (Array.isArray(inspection.equipments) ? inspection.equipments : []).map((equipment) => buildEquipmentData(equipment));
+  const equipments = await Promise.all(
+    (Array.isArray(inspection.equipments) ? inspection.equipments : []).map((equipment) => buildEquipmentData(equipment))
+  );
   const totalFindings = equipments.reduce((sum, equipment) => sum + equipment.findings.length, 0);
   const totalServicePhotos = equipments.reduce((sum, equipment) => sum + equipment.servicePhotos.length, 0);
   const totalFindingPhotos = equipments.reduce((sum, equipment) => sum + equipment.totalFindingPhotos, 0);
@@ -107,16 +109,18 @@ function buildReportData(inspection) {
   };
 }
 
-function buildEquipmentData(equipment) {
+async function buildEquipmentData(equipment) {
   const findings = Array.isArray(equipment.findings) ? equipment.findings : [];
   const servicePhotos = Array.isArray(equipment.servicePhotos) ? equipment.servicePhotos : [];
   const totalFindingPhotos = findings.reduce((sum, finding) => sum + ((finding.photos || []).length), 0);
+  const checklistImage = equipment.checklistImage && equipment.checklistImage.dataUrl ? equipment.checklistImage : null;
+
   return {
     ...equipment,
     findings,
     servicePhotos,
     totalFindingPhotos,
-    checklistPdf: equipment.checklistPdf && equipment.checklistPdf.dataUrl ? equipment.checklistPdf : null,
+    checklistImage,
     recommendationText: equipment.recommendations && equipment.recommendations.trim()
       ? equipment.recommendations.trim()
       : buildAutomaticRecommendations(findings, equipment.overallCondition),
@@ -278,7 +282,7 @@ function renderEquipmentSection(report, equipment, index) {
     report,
     equipment,
     index,
-    equipment.checklistPdf
+    equipment.checklistImage
   );
 
   return `
@@ -409,8 +413,8 @@ function renderEvidencePage(report, equipment, equipmentIndex, title, photos, su
   `;
 }
 
-function renderChecklistPdfPages(report, equipment, equipmentIndex, checklistPdf) {
-  if (!checklistPdf || !checklistPdf.dataUrl) {
+function renderChecklistPdfPages(report, equipment, equipmentIndex, checklistImage) {
+  if (!checklistImage || !checklistImage.dataUrl) {
     return "";
   }
 
@@ -421,10 +425,11 @@ function renderChecklistPdfPages(report, equipment, equipmentIndex, checklistPdf
         <table class="meta-table">
           <tr>
             <td width="35%"><div class="label">Equipo</div><div class="value">${escapeHtml(equipment.equipmentName || `Equipo ${equipmentIndex + 1}`)}</div></td>
-            <td width="65%"><div class="label">Archivo</div><div class="value">${escapeHtml(checklistPdf.name || "checklist.pdf")}</div></td>
+            <td width="30%"><div class="label">Folio checklist</div><div class="value">${escapeHtml(equipment.checklistFolio || "No capturado")}</div></td>
+            <td width="35%"><div class="label">Archivo</div><div class="value">${escapeHtml(checklistImage.name || "checklist.jpg")}</div></td>
           </tr>
         </table>
-        <embed class="pdf-frame" src="${checklistPdf.dataUrl}" type="application/pdf">
+        <img class="checklist-page-image" src="${checklistImage.dataUrl}" alt="Checklist escaneado">
       </div>
       <div class="footer">
         <span>${escapeHtml(report.reportNumber || "Sin folio")} | ${escapeHtml(equipment.equipmentName || `Equipo ${equipmentIndex + 1}`)}</span>
