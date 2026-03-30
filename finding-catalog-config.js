@@ -24,14 +24,14 @@ window.FINDING_CATALOG_CONFIG = {
     "Casquillos y puntas - ASME B30.2-2.4.2(e)",
     "Punto fijo - ASME B30.2-2.4.2(f)"
   ],
-  "Cable de carga auxiliar": [
-    "Diametro - ASME B30.2-2.4.2",
-    "Caidas - CMAA 70 Section 4.13",
-    "Lubricacion - CMAA 70 Section 5.2.6",
-    "Deformacion y/o cocas - ASME B30.2-2.4.3",
-    "Hilos y torones - OSHA 1910.179(j)(2)(ii)",
-    "Casquillos y puntas - ASME B30.2-2.4.2(e)",
-    "Punto fijo - ASME B30.2-2.4.2(f)"
+  "Cadena de Carga.": [
+    "Diametro - NOM-006-STPS-2023-8.2.2",
+    "Caidas - NOM-006-STPS-2023-8.2.2",
+    "Lubricacion - NOM-006-STPS-2023-8.2.2",
+    "Deformacion y/o Daños - NOM-006-STPS-2023-8.2.2",
+    "Longitud y Eslabones - NOM-006-STPS-2023-8.2.2",
+    "Bloque Limit Switch Exterior - NOM-006-STPS-2023-8.2.2",
+    "Bolsa de Cadena - NOM-006-STPS-2023-8.2.2"
   ],
   "Aparejo superior": [
     "Poleas de aparejo superior - ASME B30.2-2.2.2",
