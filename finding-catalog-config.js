@@ -119,14 +119,14 @@ window.FINDING_CATALOG_CONFIG = {
     "Brazo de arrastre - CMAA 70 Section 4.7"
   ],
   "Sistema de mando de grua": [
-    "Botonera - OSHA 1910.179(g)(2)",
-    "Cable de botonera - NFPA 70 Article 610",
-    "Caja de interconexiones - NFPA 70 Article 110",
-    "Radiocontrol - ASME B30.2-2.2.4",
-    "Cabina - OSHA 1910.179(b)(2)",
-    "Asiento de operador - OSHA 1910.179(b)(2)",
-    "Palancas de mando de cabina - OSHA 1910.179(g)(2)",
-    "Paro de emergencia - OSHA 1910.179(n)(3)"
+    "Carcasa de Botonera - OSHA 1910.179(g)(2)",
+    "Cable de botonera - ASME B30.2-1.13.1 (d)",
+    "Caja de interconexiones - ASME B30.2-1.13.2 (A)",
+    "Radiocontrol sin Interferencia - ASME B30.2-2.2.4",
+    "Paro de Emergencia - NOM-006 8.1.b",
+    "Cable de Tensión - ASME B30.2-1.13.1 (d)",
+    "Botones funcionales - ASME B30.2-1.13.1 (d)",
+    "Botones etiquetados legiblemente - ASME B30.2-1.13.1 (d)"
   ],
   "Alimentacion electrica de grua": [
     "Interruptor de grua - OSHA 1910.179(g)(1)",
@@ -145,6 +145,9 @@ window.FINDING_CATALOG_CONFIG = {
     "Nivelacion de columnas - CMAA 70 Section 3.3",
     "Nivelacion de rieles - CMAA 70 Section 3.2.3",
     "Torque de anclas - AISC Steel Construction Manual",
-    "Cimentacion - CMAA 74 Section 2"
+    "Cimentacion - CMAA 74 Section 2",
+    "Daño a Columna - ASME 30.2-1.3.2 (2)",
+    "Tornillería - ASME 30.2-1.3.2 (2)",
+    "Soldadura - ASME 30.2-1.3.2 (2)"
   ]
 };
